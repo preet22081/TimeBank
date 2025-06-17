@@ -1,12 +1,11 @@
+'use client';
+
 export default function AdminPage() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-      <p className="text-gray-600">
-        Manage user accounts, review flagged services, and adjust time credits.
-      </p>
-      <div className="mt-4 p-4 bg-yellow-100 text-yellow-800 rounded">
-        Admin-only area: This is a placeholder for future features.
+    <div className="min-h-screen bg-[#F8FAFC] text-[#334155] p-6">
+      <h1 className="text-3xl font-extrabold text-[#1E293B] mb-4 text-center">Admin Dashboard</h1>
+      <div className="mt-6 p-6 bg-white text-center rounded-lg shadow">
+        <p>Admin area for managing users and system settings.</p>
       </div>
     </div>
   );

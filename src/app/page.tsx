@@ -1,46 +1,31 @@
-import Link from "next/link";
-import Image from "next/image";
-import Navbar from "@/components/Navbar";
+'use client';
+
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
+  const router = useRouter();
+
   return (
-    <>
-      <Navbar />
-      <div className="flex flex-col items-center justify-center min-h-screen bg-emerald-50 text-center px-4">
-        <h1 className="text-4xl font-extrabold text-emerald-700 mt-12">
-          Welcome to TimeBank
-        </h1>
-        <p className="mt-3 text-emerald-900 max-w-md">
-          Exchange time, share skills, and build community connections.
-        </p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] text-[#334155] p-6">
+      <img src="/hero.png" alt="Site Logo" className="w-32 h-32 mb-6" /> {/* Replace with your actual logo path */}
 
-        {/* Hero Image */}
-        <div className="mt-8">
-          <Image
-            src="/hero.png"
-            alt="Community helping each other"
-            width={300}
-            height={300}
-            className="rounded shadow-lg"
-          />
-        </div>
+      <h1 className="text-4xl font-extrabold text-[#1E293B] mb-4">Welcome to Time Bank</h1>
+      <p className="text-lg mb-6 text-center max-w-md">Exchange time, grow together. Join now to give or receive services in your community.</p>
 
-        {/* Action Buttons */}
-        <div className="mt-10 flex flex-col sm:flex-row gap-4">
-          <Link
-            href="/login"
-            className="bg-emerald-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-emerald-700 transition"
-          >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            className="bg-white border border-emerald-600 text-emerald-600 px-6 py-3 rounded-full font-semibold hover:bg-emerald-100 transition"
-          >
-            Register
-          </Link>
-        </div>
+      <div className="flex space-x-4">
+        <button
+          onClick={() => router.push('/login')}
+          className="bg-[#3EB489] text-white px-6 py-2 rounded hover:bg-[#32a17b]"
+        >
+          Login
+        </button>
+        <button
+          onClick={() => router.push('/register')}
+          className="bg-white border border-[#3EB489] text-[#3EB489] px-6 py-2 rounded hover:bg-[#f0fdf9]"
+        >
+          Register
+        </button>
       </div>
-    </>
+    </div>
   );
 }

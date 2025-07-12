@@ -1,76 +1,57 @@
 'use client';
-
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
-    if (!email || !password) {
-      setError('Please enter both email and password.');
-      return;
-    }
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
 
-    try {
-      const res = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+    const data = await res.json();
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || 'Login failed.');
-        return;
-      }
-
-      localStorage.setItem('timebank_token', 'true');
+    if (res.ok) {
+      localStorage.setItem('timebank_token', data.token);
       router.push('/dashboard');
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Something went wrong. Please try again.');
+    } else {
+      alert(data.error || 'Login failed');
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] px-4">
-      <h1 className="text-3xl font-extrabold text-[#1E293B] mb-6">Login</h1>
-
+    <div className="flex justify-center items-center h-screen bg-gray-100">
       <form
         onSubmit={handleLogin}
-        className="w-full max-w-sm bg-white p-6 rounded-lg shadow space-y-4"
+        className="bg-white p-8 rounded shadow-md w-full max-w-sm"
       >
-        {error && (
-          <p className="text-red-500 text-sm font-medium">{error}</p>
-        )}
-
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Login</h2>
         <input
           type="email"
           placeholder="Email"
+          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="border p-3 w-full rounded-md text-black bg-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#3EB489]"
           required
         />
-
         <input
           type="password"
           placeholder="Password"
+          className="w-full mb-6 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="border p-3 w-full rounded-md text-black bg-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#3EB489]"
           required
         />
-
-        <button className="w-full bg-[#3EB489] text-white py-2 rounded-md hover:bg-[#32a17b] font-semibold">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
           Login
         </button>
       </form>

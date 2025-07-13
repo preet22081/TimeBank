@@ -23,12 +23,21 @@ export default function Navbar() {
         >
           Search
         </Link>
-        <Link
-          href="/admin"
-          className="hover:text-[#3EB489] transition duration-300"
-        >
-          Admin
+        <Link href="/add-offer" className="hover:text-[#3EB489] transition duration-300">
+          Add Offer
         </Link>
+        <Link href="/add-request" className="hover:text-[#3EB489] transition duration-300">
+          Add Request
+        </Link>
+        <Link href="/profile" className="hover:text-[#3EB489] transition duration-300">
+  Profile
+</Link>
+
+        <Link href="/bookings" className="hover:text-[#3EB489] transition duration-300">
+  Bookings
+</Link>
+
+        
       </div>
 
       <button

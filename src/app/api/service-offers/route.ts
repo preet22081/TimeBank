@@ -1,32 +1,38 @@
 // src/app/api/service-offers/route.ts
-import {connectToDB} from "@/lib/mongodb";
-import ServiceOffer from "@/models/ServiceOffer";
-import { NextResponse } from "next/server";
+import { connectToDB } from '@/lib/mongodb';
+import ServiceOffer from '@/models/ServiceOffer';
+import { NextResponse } from 'next/server';
 
-// GET /api/service-offers
-export async function GET() {
-await connectToDB();
-const offers = await ServiceOffer.find();
-return NextResponse.json(offers, { status: 200 });
-}
-
-// POST /api/service-offers
 export async function POST(req: Request) {
-await connectToDB();
-const { userId, title, description, category, timeRequired } = await req.json();
+  await connectToDB();
+  const body = await req.json();
 
-try {
-    const newOffer = new ServiceOffer({
-    userId,
-    title,
-    description,
-    category,
-    timeRequired,
-    });
+  try {
+    const offer = await ServiceOffer.create(body);
+    return NextResponse.json(offer, { status: 201 });
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to create offer' }, { status: 500 });
+  }
+}
 
-    await newOffer.save();
-    return NextResponse.json(newOffer, { status: 201 });
-} catch (error) {
-    return NextResponse.json({ error: "Failed to create offer" }, { status: 500 });
+export async function GET(req: Request) {
+  await connectToDB();
+  const { searchParams } = new URL(req.url);
+  const filters: any = {};
+
+  if (searchParams.has('skill')) {
+    filters.category = { $regex: searchParams.get('skill'), $options: 'i' };
+  }
+
+  if (searchParams.has('date')) {
+    filters.availableDate = searchParams.get('date');
+  }
+
+  try {
+    const offers = await ServiceOffer.find(filters);
+    return NextResponse.json(offers);
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to fetch offers' }, { status: 500 });
+  }
 }
-}
+

@@ -9,20 +9,14 @@ status: "pending" | "accepted" | "completed" | "cancelled";
 timeCredits: number;
 }
 
-const BookingSchema: Schema = new Schema(
-{
-    requesterId: { type: String, required: true },
-    providerId: { type: String, required: true },
-    serviceId: { type: String, required: true },
-    date: Date,
-    status: {
-    type: String,
-enum: ["pending", "accepted", "completed", "cancelled"],
-default: "pending",
-    },
-    timeCredits: { type: Number, required: true },
-},
-{ timestamps: true }
-);
+const BookingSchema = new Schema({
+  serviceOffer: { type: Schema.Types.ObjectId, ref: 'ServiceOffer' },
+  serviceRequest: { type: Schema.Types.ObjectId, ref: 'ServiceRequest' },
+  bookedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+  bookedWith: { type: Schema.Types.ObjectId, ref: 'User' },
+  status: { type: String, enum: ['pending', 'confirmed', 'completed'], default: 'pending' },
+  scheduledDate: Date,
+}, { timestamps: true });
+
 
 export default models.Booking || mongoose.model<IBooking>("Booking", BookingSchema);

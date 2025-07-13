@@ -8,22 +8,38 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
+  try {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', // 🔑 important!
+      },
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json(); // may throw if response body is empty
+    } catch (jsonError) {
+      console.error("Failed to parse JSON:", jsonError);
+      alert("Server returned an invalid response.");
+      return;
+    }
 
     if (res.ok) {
       localStorage.setItem('timebank_token', data.token);
       router.push('/dashboard');
     } else {
-      alert(data.error || 'Login failed');
+      alert(data?.error || 'Login failed');
     }
-  };
+  } catch (err) {
+    console.error("Login error:", err);
+    alert("Something went wrong. Please try again.");
+  }
+};
+
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">

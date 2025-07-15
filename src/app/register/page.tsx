@@ -1,85 +1,92 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
-    role: 'user'
+    role: 'user',
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-    });
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
 
-    if (res.ok) {
-      alert('Registration successful!');
+      alert('Registered successfully! Please log in.');
       router.push('/login');
-    } else {
-      alert(data.error || 'Registration failed');
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleRegister}
-        className="bg-white p-8 rounded shadow-md w-full max-w-sm"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Register</h2>
-
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded shadow-md w-80">
+        <h2 className="text-2xl font-semibold mb-4">Register</h2>
         <input
-          type="text"
+          name="name"
           placeholder="Name"
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
+          className="border px-3 py-2 mb-3 w-full rounded"
+          onChange={handleChange}
         />
-
         <input
-          type="email"
+          name="email"
           placeholder="Email"
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
+          className="border px-3 py-2 mb-3 w-full rounded"
+          onChange={handleChange}
         />
-
         <input
+          name="password"
           type="password"
           placeholder="Password"
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required
+          className="border px-3 py-2 mb-3 w-full rounded"
+          onChange={handleChange}
         />
-
         <select
-          className="w-full mb-6 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={formData.role}
-          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          name="role"
+          value={form.role}
+          onChange={handleChange}
+          className="border px-3 py-2 mb-4 w-full rounded"
         >
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select>
-
         <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+          onClick={handleSubmit}
+          disabled={loading}
+          className="bg-green-600 text-white px-4 py-2 w-full rounded hover:bg-green-700"
         >
-          Register
+          {loading ? 'Registering...' : 'Register'}
         </button>
-      </form>
+
+        {/* 🔁 Login Link */}
+        <p className="mt-4 text-sm text-center">
+          Already have an account?{' '}
+          <Link href="/login" className="text-blue-600 hover:underline">
+            Login
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

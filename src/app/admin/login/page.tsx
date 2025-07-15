@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: '', password: '', role: 'user' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -24,14 +24,13 @@ export default function LoginPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Login failed');
 
-      localStorage.setItem('timebank_token', data.token);
-
-      // Redirect by role
-      if (data.user.role === 'admin') {
-        router.push('/admin/dashboard');
-      } else {
-        router.push('/dashboard');
+      // ✅ Only allow admins to access
+      if (data.user.role !== 'admin') {
+        throw new Error('Access denied. Admins only.');
       }
+
+      localStorage.setItem('timebank_token', data.token);
+      router.push('/admin/dashboard');
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -42,33 +41,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-80">
-        <h2 className="text-2xl font-semibold mb-4">Login</h2>
-
+        <h2 className="text-2xl font-semibold mb-4">Admin Login</h2>
         <input
           name="email"
           placeholder="Email"
           className="border px-3 py-2 mb-3 w-full rounded"
           onChange={handleChange}
         />
-
         <input
           name="password"
           type="password"
           placeholder="Password"
-          className="border px-3 py-2 mb-3 w-full rounded"
+          className="border px-3 py-2 mb-4 w-full rounded"
           onChange={handleChange}
         />
-
-        <select
-          name="role"
-          className="border px-3 py-2 mb-4 w-full rounded"
-          value={form.role}
-          onChange={handleChange}
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-
         <button
           onClick={handleSubmit}
           disabled={loading}
@@ -76,13 +62,6 @@ export default function LoginPage() {
         >
           {loading ? 'Logging in...' : 'Login'}
         </button>
-
-        <p className="text-sm text-center mt-4">
-          Don&apos;t have an account?{' '}
-          <a href="/register" className="text-blue-600 hover:underline">
-            Register
-          </a>
-        </p>
       </div>
     </div>
   );

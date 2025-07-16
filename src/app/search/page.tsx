@@ -10,16 +10,13 @@ export default function SearchPage() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ✅ fetch all offers + requests (no filters)
   const fetchAll = async () => {
     setLoading(true);
     try {
       const offerRes = await fetch('/api/service-offers');
       const requestRes = await fetch('/api/service-requests');
 
-      if (!offerRes.ok || !requestRes.ok) {
-        throw new Error('Failed to load data');
-      }
+      if (!offerRes.ok || !requestRes.ok) throw new Error('Failed to load data');
 
       const offerData = await offerRes.json();
       const requestData = await requestRes.json();
@@ -34,16 +31,13 @@ export default function SearchPage() {
     }
   };
 
-  // ✅ fetch with search filters
   const handleSearch = async () => {
     setLoading(true);
     try {
       const offerRes = await fetch(`/api/service-offers?skill=${skill}&date=${date}`);
       const requestRes = await fetch(`/api/service-requests?skill=${skill}&date=${date}`);
 
-      if (!offerRes.ok || !requestRes.ok) {
-        throw new Error('Search request failed');
-      }
+      if (!offerRes.ok || !requestRes.ok) throw new Error('Search request failed');
 
       const offerData = await offerRes.json();
       const requestData = await requestRes.json();
@@ -58,42 +52,41 @@ export default function SearchPage() {
     }
   };
 
-  // ✅ load on page mount
   useEffect(() => {
     fetchAll();
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto mt-24 px-4">
-      <h1 className="text-3xl font-bold mb-6">Search Offers & Requests</h1>
+    <div className="max-w-5xl mx-auto px-4 mt-28 text-white">
+      <h1 className="text-3xl font-extrabold mb-8">🔍 Search Offers & Requests</h1>
 
       {/* Search Bar */}
-      <div className="bg-white shadow p-6 rounded-lg mb-8 flex flex-col md:flex-row gap-4">
+      <div className="bg-[#1e293b] shadow-lg p-6 rounded-lg mb-10 flex flex-col md:flex-row gap-4 items-center">
         <input
           type="text"
           placeholder="Skill (e.g. Tutoring)"
           value={skill}
           onChange={(e) => setSkill(e.target.value)}
-          className="border px-4 py-2 rounded w-full"
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded w-full md:max-w-[300px] placeholder:text-gray-400 placeholder:italic focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <input
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="border px-4 py-2 rounded w-full md:max-w-[200px]"
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded w-full md:w-[200px] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 invert-calendar"
         />
         <button
           onClick={handleSearch}
           disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded disabled:opacity-50"
         >
           {loading ? 'Searching...' : 'Search'}
         </button>
       </div>
 
-      {/* Skill Offers Section */}
+      {/* Skill Offers */}
       <div>
-        <h2 className="text-2xl font-semibold mb-3 text-blue-600">Skill Offers</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-blue-400">📘 Skill Offers</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {offers.map((offer: any) => (
             <Card
@@ -110,13 +103,13 @@ export default function SearchPage() {
               type="offer"
             />
           ))}
-          {!loading && offers.length === 0 && <p className="text-gray-500">No offers found.</p>}
+          {!loading && offers.length === 0 && <p className="text-gray-400">No offers found.</p>}
         </div>
       </div>
 
-      {/* Service Requests Section */}
+      {/* Service Requests */}
       <div className="mt-10">
-        <h2 className="text-2xl font-semibold mb-3 text-green-600">Service Requests</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-green-400">🟢 Service Requests</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {requests.map((req: any) => (
             <Card
@@ -129,7 +122,7 @@ export default function SearchPage() {
               type="request"
             />
           ))}
-          {!loading && requests.length === 0 && <p className="text-gray-500">No requests found.</p>}
+          {!loading && requests.length === 0 && <p className="text-gray-400">No requests found.</p>}
         </div>
       </div>
     </div>

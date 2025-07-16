@@ -11,9 +11,12 @@ export default function AddRequestPage() {
     category: '',
     preferredDate: new Date().toISOString().split('T')[0],
   });
+
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -43,14 +46,46 @@ export default function AddRequestPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-24 px-4">
-      <h1 className="text-3xl font-bold mb-6">Post a Service Request</h1>
-      <div className="flex flex-col gap-4">
-        <input name="title" placeholder="Title" className="border p-2 rounded" onChange={handleChange} />
-        <textarea name="description" placeholder="Description" className="border p-2 rounded" onChange={handleChange} />
-        <input name="category" placeholder="Category" className="border p-2 rounded" onChange={handleChange} />
-        <input type="date" name="preferredDate" value={form.preferredDate} min={new Date().toISOString().split('T')[0]} onChange={handleChange} className="border p-2 rounded" />
-        <button onClick={handleSubmit} disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+    <div className="max-w-xl mx-auto px-4 mt-28 text-white">
+      <h1 className="text-3xl font-extrabold mb-8 text-center">🛠 Post a Service Request</h1>
+
+      <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg flex flex-col gap-5">
+        <input
+          name="title"
+          placeholder="Title"
+          onChange={handleChange}
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <textarea
+          name="description"
+          placeholder="Description"
+          rows={4}
+          onChange={handleChange}
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <input
+          name="category"
+          placeholder="Category"
+          onChange={handleChange}
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+
+        <input
+          type="date"
+          name="preferredDate"
+          value={form.preferredDate}
+          onChange={handleChange}
+          min={new Date().toISOString().split('T')[0]}
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500 invert-calendar"
+        />
+
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded text-lg disabled:opacity-50"
+        >
           {loading ? 'Posting...' : 'Post Request'}
         </button>
       </div>

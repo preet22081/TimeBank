@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { User, Mail, Lock } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -40,52 +41,65 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-80">
-        <h2 className="text-2xl font-semibold mb-4">Register</h2>
-        <input
-          name="name"
-          placeholder="Name"
-          className="border px-3 py-2 mb-3 w-full rounded"
-          onChange={handleChange}
-        />
-        <input
-          name="email"
-          placeholder="Email"
-          className="border px-3 py-2 mb-3 w-full rounded"
-          onChange={handleChange}
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          className="border px-3 py-2 mb-3 w-full rounded"
-          onChange={handleChange}
-        />
-        <select
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          className="border px-3 py-2 mb-4 w-full rounded"
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="bg-green-600 text-white px-4 py-2 w-full rounded hover:bg-green-700"
-        >
-          {loading ? 'Registering...' : 'Register'}
-        </button>
-
-        {/* 🔁 Login Link */}
-        <p className="mt-4 text-sm text-center">
-          Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:underline">
-            Login
-          </Link>
-        </p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
+      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-10 w-full max-w-md text-white">
+        <h2 className="text-3xl font-bold text-center mb-6 tracking-wide">Create Account</h2>
+        <div className="space-y-5">
+          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+            <User className="w-5 h-5 mr-3 text-white" />
+            <input
+              name="name"
+              placeholder="Name"
+              className="bg-transparent outline-none text-white placeholder-gray-300 w-full"
+              onChange={handleChange}
+              value={form.name}
+            />
+          </div>
+          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+            <Mail className="w-5 h-5 mr-3 text-white" />
+            <input
+              name="email"
+              placeholder="Email"
+              className="bg-transparent outline-none text-white placeholder-gray-300 w-full"
+              onChange={handleChange}
+              value={form.email}
+            />
+          </div>
+          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+            <Lock className="w-5 h-5 mr-3 text-white" />
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              className="bg-transparent outline-none text-white placeholder-gray-300 w-full"
+              onChange={handleChange}
+              value={form.password}
+            />
+          </div>
+          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+            <User className="w-5 h-5 mr-3 text-white" />
+            <select
+              name="role"
+              className="bg-transparent outline-none text-white w-full"
+              onChange={handleChange}
+              value={form.role}
+            >
+              <option value="user" className="text-black">User</option>
+              <option value="admin" className="text-black">Admin</option>
+            </select>
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-green-600 hover:bg-green-700 transition py-2 rounded-lg text-white font-semibold tracking-wide shadow-md hover:shadow-lg"
+          >
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+          <p className="text-center text-sm text-gray-300 mt-5">
+            Already have an account?{' '}
+            <Link href="/login" className="text-blue-400 hover:underline">Login</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

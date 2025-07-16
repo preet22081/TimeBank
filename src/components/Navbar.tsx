@@ -1,51 +1,57 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { UserCircle } from 'lucide-react';
 
 export default function Navbar() {
+  const router = useRouter();
+
   const handleLogout = () => {
-    localStorage.removeItem('timebank_token'); // Clear login token
-    window.location.href = '/login'; // Redirect to login page
+    localStorage.removeItem('timebank_token');
+    router.push('/login');
   };
 
   return (
-    <nav className="bg-white text-gray-800 px-6 py-4 shadow-md flex justify-between items-center fixed w-full top-0 z-50">
-      <div className="flex gap-6 font-semibold text-lg">
-        <Link
-          href="/dashboard"
-          className="hover:text-[#3EB489] transition duration-300"
-        >
-          Dashboard
-        </Link>
-        <Link
-          href="/search"
-          className="hover:text-[#3EB489] transition duration-300"
-        >
-          Search
-        </Link>
-        <Link href="/add-offer" className="hover:text-[#3EB489] transition duration-300">
-          Add Offer
-        </Link>
-        <Link href="/add-request" className="hover:text-[#3EB489] transition duration-300">
-          Add Request
-        </Link>
-        <Link href="/profile" className="hover:text-[#3EB489] transition duration-300">
-  Profile
-</Link>
+    <nav className="fixed top-0 left-0 w-full z-50 bg-[#0f172a] text-white shadow-md">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        {/* Left links */}
+        <div className="flex gap-6 font-medium text-base">
+          {[
+            ['Dashboard', '/dashboard'],
+            ['Search', '/search'],
+            ['Add Offer', '/add-offer'],
+            ['Add Request', '/add-request'],
+            ['Bookings', '/bookings'],
+          ].map(([label, path]) => (
+            <Link
+              key={path}
+              href={path}
+              className="hover:text-cyan-400 transition duration-200"
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
 
-        <Link href="/bookings" className="hover:text-[#3EB489] transition duration-300">
-  Bookings
-</Link>
+        {/* Right section: profile and logout */}
+        <div className="flex items-center gap-4">
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 text-sm hover:text-cyan-300 transition"
+          >
+            <UserCircle className="w-5 h-5" />
+            <span className="font-medium">Profile</span>
+          </Link>
 
-        
+          <button
+            onClick={handleLogout}
+            className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition"
+          >
+            Logout
+          </button>
+        </div>
       </div>
-
-      <button
-        onClick={handleLogout}
-        className="bg-[#3EB489] text-white font-semibold text-lg px-4 py-2 rounded hover:bg-[#32a17b] transition duration-300"
-      >
-        Logout
-      </button>
     </nav>
   );
 }

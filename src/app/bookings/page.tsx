@@ -5,14 +5,21 @@ import { useEffect, useState } from 'react';
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('timebank_token') : null;
+  const token =
+    typeof window !== 'undefined' ? localStorage.getItem('timebank_token') : null;
   const userId = token ? JSON.parse(atob(token.split('.')[1])).userId : null;
 
   const fetchBookings = async () => {
-    const res = await fetch('/api/bookings');
-    const data = await res.json();
-    const myBookings = data.filter((b: any) => b.bookedBy._id === userId || b.bookedWith._id === userId);
-    setBookings(myBookings);
+    try {
+      const res = await fetch('/api/bookings');
+      const data = await res.json();
+      const myBookings = data.filter(
+        (b: any) => b.bookedBy._id === userId || b.bookedWith._id === userId
+      );
+      setBookings(myBookings);
+    } catch (err) {
+      console.error('Failed to fetch bookings:', err);
+    }
   };
 
   const handleCancel = async (id: string) => {
@@ -33,24 +40,52 @@ export default function BookingsPage() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto mt-24 px-4">
-      <h1 className="text-3xl font-bold mb-6">Your Bookings</h1>
+    <div className="max-w-4xl mx-auto mt-28 px-4 text-white">
+      <h1 className="text-3xl font-extrabold mb-8 text-center">📅 Your Bookings</h1>
+
       {bookings.length === 0 ? (
-        <p>No bookings found.</p>
+        <div className="text-center text-gray-400 bg-[#1e293b] p-8 rounded-lg shadow">
+          No bookings found.
+        </div>
       ) : (
-        bookings.map((b: any) => (
-          <div key={b._id} className="border p-4 rounded mb-4 bg-white shadow">
-            <p><strong>With:</strong> {b.bookedWith.name}</p>
-            <p><strong>Scheduled:</strong> {new Date(b.scheduledDate).toDateString()}</p>
-            <p><strong>Status:</strong> {b.status}</p>
-            <button
-              onClick={() => handleCancel(b._id)}
-              className="mt-2 bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
+        <div className="grid gap-5">
+          {bookings.map((b: any) => (
+            <div
+              key={b._id}
+              className="bg-[#1e293b] border border-gray-700 p-5 rounded-lg shadow hover:shadow-lg transition"
             >
-              Cancel Booking
-            </button>
-          </div>
-        ))
+              <p className="mb-1">
+                <span className="font-medium text-gray-300">👤 With:</span>{' '}
+                {b.bookedWith.name}
+              </p>
+              <p className="mb-1">
+                <span className="font-medium text-gray-300">📅 Scheduled:</span>{' '}
+                {new Date(b.scheduledDate).toLocaleDateString()}
+              </p>
+              <p className="mb-3">
+                <span className="font-medium text-gray-300">⏳ Status:</span>{' '}
+                <span
+                  className={`font-bold ${
+                    b.status === 'pending'
+                      ? 'text-yellow-400'
+                      : b.status === 'approved'
+                      ? 'text-green-400'
+                      : 'text-red-400'
+                  }`}
+                >
+                  {b.status}
+                </span>
+              </p>
+
+              <button
+                onClick={() => handleCancel(b._id)}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 text-sm rounded"
+              >
+                Cancel Booking
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

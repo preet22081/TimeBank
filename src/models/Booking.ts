@@ -1,22 +1,28 @@
-import mongoose, { Schema, Document, models } from "mongoose";
+import mongoose, { Schema, Document, models, Types } from 'mongoose';
 
 export interface IBooking extends Document {
-requesterId: string;
-providerId: string;
-serviceId: string;
-date: Date;
-status: "pending" | "accepted" | "completed" | "cancelled";
-timeCredits: number;
+  serviceOffer?: Types.ObjectId;
+  serviceRequest?: Types.ObjectId;
+  bookedBy: Types.ObjectId;
+  bookedWith: Types.ObjectId;
+  status: 'pending' | 'confirmed' | 'completed' | 'rejected' | 'cancelled';
+  scheduledDate: Date;
 }
 
-const BookingSchema = new Schema({
-  serviceOffer: { type: Schema.Types.ObjectId, ref: 'ServiceOffer' },
-  serviceRequest: { type: Schema.Types.ObjectId, ref: 'ServiceRequest' },
-  bookedBy: { type: Schema.Types.ObjectId, ref: 'User' },
-  bookedWith: { type: Schema.Types.ObjectId, ref: 'User' },
-  status: { type: String, enum: ['pending', 'confirmed', 'completed'], default: 'pending' },
-  scheduledDate: Date,
-}, { timestamps: true });
+const BookingSchema = new Schema<IBooking>(
+  {
+    serviceOffer: { type: Schema.Types.ObjectId, ref: 'ServiceOffer' },
+    serviceRequest: { type: Schema.Types.ObjectId, ref: 'ServiceRequest' },
+    bookedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    bookedWith: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    status: {
+      type: String,
+      enum: ['pending', 'confirmed', 'completed', 'rejected', 'cancelled'],
+      default: 'pending',
+    },
+    scheduledDate: { type: Date, required: true },
+  },
+  { timestamps: true }
+);
 
-
-export default models.Booking || mongoose.model<IBooking>("Booking", BookingSchema);
+export default models.Booking || mongoose.model<IBooking>('Booking', BookingSchema);

@@ -6,26 +6,40 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] text-[#334155] p-6">
-      <img src="/hero.png" alt="Site Logo" className="w-32 h-32 mb-6" /> {/* Replace with your actual logo path */}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] px-4 text-white">
+      {/* Glassmorphic Card */}
+      <div className="backdrop-blur-md bg-white/5 border border-white/10 shadow-2xl rounded-2xl p-10 max-w-lg w-full text-center transition duration-300 hover:scale-[1.02]">
+        <img
+          src="/hero.png"
+          alt="Time Bank Logo"
+          className="w-24 h-24 mx-auto mb-6 rounded-full shadow-lg border border-white/20"
+        />
 
-      <h1 className="text-4xl font-extrabold text-[#1E293B] mb-4">Welcome to Time Bank</h1>
-      <p className="text-lg mb-6 text-center max-w-md">Exchange time, grow together. Join now to give or receive services in your community.</p>
+        <h1 className="text-4xl font-bold text-white mb-4 tracking-tight">
+          Welcome to <span className="text-[#00ffcc]">Time Bank</span>
+        </h1>
+        <p className="text-gray-300 text-md mb-6 leading-relaxed">
+          Exchange your time for services and grow your community together. Save time, help others, and connect meaningfully.
+        </p>
 
-      <div className="flex space-x-4">
-        <button
-          onClick={() => router.push('/login')}
-          className="bg-[#3EB489] text-white px-6 py-2 rounded hover:bg-[#32a17b]"
-        >
-          Login
-        </button>
-        <button
-          onClick={() => router.push('/register')}
-          className="bg-white border border-[#3EB489] text-[#3EB489] px-6 py-2 rounded hover:bg-[#f0fdf9]"
-        >
-          Register
-        </button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onClick={() => router.push('/login')}
+            className="bg-[#00ffcc] hover:bg-[#00e6b8] text-[#0f172a] font-semibold px-6 py-2 rounded-lg transition shadow-md"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => router.push('/register')}
+            className="border border-[#00ffcc] text-[#00ffcc] hover:bg-[#00ffcc1a] px-6 py-2 rounded-lg transition shadow-md"
+          >
+            Register
+          </button>
+        </div>
       </div>
+
+      {/* Glow effect at bottom */}
+      <div className="absolute bottom-0 h-32 w-full bg-gradient-to-t from-[#00ffcc]/10 to-transparent pointer-events-none" />
     </div>
   );
 }

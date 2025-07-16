@@ -64,10 +64,10 @@ export default function Card({ id, title, description, tags, userId, type }: Car
     <motion.div
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.3 }}
-      className="p-5 border rounded-xl shadow-md bg-white hover:shadow-xl transition"
+      className="p-5 border rounded-xl shadow-md bg-white dark:bg-[#1e293b] hover:shadow-xl transition text-gray-800 dark:text-white"
     >
-      <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-      <p className="text-gray-600 mt-2">{description}</p>
+      <h2 className="text-xl font-semibold">{title}</h2>
+      <p className="mt-2">{description}</p>
 
       {tags && (
         <motion.div
@@ -78,7 +78,7 @@ export default function Card({ id, title, description, tags, userId, type }: Car
           {tags.map((tag, idx) => (
             <span
               key={idx}
-              className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs"
+              className="bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 px-3 py-1 rounded-full text-xs"
             >
               {tag}
             </span>
@@ -90,7 +90,10 @@ export default function Card({ id, title, description, tags, userId, type }: Car
         type="date"
         value={selectedDate}
         onChange={(e) => setSelectedDate(e.target.value)}
-        className="mt-4 border rounded px-3 py-2 text-sm w-full"
+        className="mt-4 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 text-sm w-full
+          text-gray-800 dark:text-white dark:bg-[#1e293b] 
+          focus:outline-none focus:ring-2 focus:ring-blue-500 
+          [&::-webkit-calendar-picker-indicator]:invert"
       />
 
       <button

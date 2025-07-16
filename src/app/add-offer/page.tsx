@@ -10,12 +10,14 @@ export default function AddOfferPage() {
     description: '',
     category: '',
     timeRequired: 1,
-    availableDate: new Date().toISOString().split('T')[0], // Default to today
+    availableDate: new Date().toISOString().split('T')[0],
   });
 
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setForm((prev) => ({
       ...prev,
@@ -37,15 +39,10 @@ export default function AddOfferPage() {
 
     setLoading(true);
     try {
-      const body = {
-        ...form,
-        userId, // ✅ Important: Send this with exact name your backend expects
-      };
-
       const res = await fetch('/api/service-offers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ ...form, userId }),
       });
 
       if (!res.ok) throw new Error('Failed to create offer');
@@ -60,51 +57,60 @@ export default function AddOfferPage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-24 px-4">
-      <h1 className="text-3xl font-bold mb-6">Post a Skill Offer</h1>
-      <div className="flex flex-col gap-4">
+    <div className="max-w-xl mx-auto px-4 mt-28 text-white">
+      <h1 className="text-3xl font-extrabold mb-8 text-center">
+        🚀 Post a Skill Offer
+      </h1>
+
+      <div className="bg-[#1e293b] p-6 rounded-lg shadow-lg flex flex-col gap-5">
         <input
           name="title"
           placeholder="Title"
-          className="border p-2 rounded"
           value={form.title}
           onChange={handleChange}
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <textarea
           name="description"
           placeholder="Description"
-          className="border p-2 rounded"
           value={form.description}
           onChange={handleChange}
+          rows={4}
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <input
           name="category"
           placeholder="Category"
-          className="border p-2 rounded"
           value={form.category}
           onChange={handleChange}
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <input
           name="timeRequired"
           type="number"
           min="1"
           placeholder="Time Required (hours)"
-          className="border p-2 rounded"
           value={form.timeRequired}
           onChange={handleChange}
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <input
           type="date"
           name="availableDate"
           value={form.availableDate}
           onChange={handleChange}
           min={new Date().toISOString().split('T')[0]}
-          className="border p-2 rounded"
+          className="bg-[#0f172a] text-white border border-gray-600 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 invert-calendar"
         />
+
         <button
           onClick={handleSubmit}
           disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-lg disabled:opacity-50"
         >
           {loading ? 'Posting...' : 'Post Offer'}
         </button>

@@ -8,7 +8,8 @@ export default function ProfilePage() {
   const [form, setForm] = useState<any>({});
   const [loading, setLoading] = useState(false);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('timebank_token') : null;
+  const token =
+    typeof window !== 'undefined' ? localStorage.getItem('timebank_token') : null;
   const userId = token ? JSON.parse(atob(token.split('.')[1])).userId : null;
 
   useEffect(() => {
@@ -44,46 +45,93 @@ export default function ProfilePage() {
           avatarUrl: form.avatarUrl,
         }),
       });
-      alert('Updated successfully');
+      alert('✅ Profile updated successfully');
       setEdit(false);
     } catch {
-      alert('Update failed');
+      alert('❌ Update failed');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!user) return <div className="mt-24 text-center">Loading profile...</div>;
+  if (!user) {
+    return (
+      <div className="mt-28 text-center text-white text-lg animate-pulse">
+        Loading profile...
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-3xl mx-auto mt-24 px-4">
-      <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
+    <div className="max-w-3xl mx-auto mt-28 px-4 text-white">
+      <h1 className="text-3xl font-extrabold mb-8 text-center">👤 Your Profile</h1>
 
-      <div className="flex flex-col gap-3">
-        {/* <img src={form.avatarUrl || '/default-avatar.png'} className="w-24 h-24 rounded-full" alt="avatar" /> */}
-        <p><strong>Name:</strong> {user.name}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Time Credits:</strong> {user.timeCredits}</p>
+      <div className="bg-[#1e293b] p-6 rounded-lg shadow space-y-4">
+        {/* <img src={form.avatarUrl || '/default-avatar.png'} className="w-24 h-24 rounded-full" /> */}
+        <p>
+          <span className="font-semibold text-gray-300">Name:</span> {user.name}
+        </p>
+        <p>
+          <span className="font-semibold text-gray-300">Email:</span> {user.email}
+        </p>
+        <p>
+          <span className="font-semibold text-gray-300">Time Credits:</span> {user.timeCredits}
+        </p>
 
         {edit ? (
-          <>
-            <textarea name="bio" value={form.bio} onChange={handleChange} className="border p-2 rounded" placeholder="Bio" />
-            <input name="skillOffered" value={form.skillOffered} onChange={handleChange} className="border p-2 rounded" placeholder="Skills Offered (comma-separated)" />
-            <input name="skillNeeded" value={form.skillNeeded} onChange={handleChange} className="border p-2 rounded" placeholder="Skills Needed (comma-separated)" />
+          <div className="space-y-3">
+            <textarea
+              name="bio"
+              value={form.bio}
+              onChange={handleChange}
+              placeholder="Bio"
+              className="w-full bg-[#0f172a] border border-gray-600 rounded p-2 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              name="skillOffered"
+              value={form.skillOffered}
+              onChange={handleChange}
+              placeholder="Skills Offered (comma-separated)"
+              className="w-full bg-[#0f172a] border border-gray-600 rounded p-2 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500"
+            />
+            <input
+              name="skillNeeded"
+              value={form.skillNeeded}
+              onChange={handleChange}
+              placeholder="Skills Needed (comma-separated)"
+              className="w-full bg-[#0f172a] border border-gray-600 rounded p-2 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500"
+            />
             {/* <input name="avatarUrl" value={form.avatarUrl} onChange={handleChange} className="border p-2 rounded" placeholder="Avatar URL" /> */}
-            <button onClick={handleUpdate} disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-              {loading ? 'Saving...' : 'Save Changes'}
+
+            <button
+              onClick={handleUpdate}
+              disabled={loading}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+            >
+              {loading ? 'Saving...' : '💾 Save Changes'}
             </button>
-          </>
+          </div>
         ) : (
-          <>
-            <p><strong>Bio:</strong> {user.bio || '-'}</p>
-            <p><strong>Skills Offered:</strong> {user.skillOffered?.join(', ') || '-'}</p>
-            <p><strong>Skills Needed:</strong> {user.skillNeeded?.join(', ') || '-'}</p>
-            <button onClick={() => setEdit(true)} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-              Edit Profile
+          <div className="space-y-2">
+            <p>
+              <span className="font-semibold text-gray-300">Bio:</span>{' '}
+              {user.bio || <span className="text-gray-500">-</span>}
+            </p>
+            <p>
+              <span className="font-semibold text-gray-300">Skills Offered:</span>{' '}
+              {user.skillOffered?.join(', ') || <span className="text-gray-500">-</span>}
+            </p>
+            <p>
+              <span className="font-semibold text-gray-300">Skills Needed:</span>{' '}
+              {user.skillNeeded?.join(', ') || <span className="text-gray-500">-</span>}
+            </p>
+            <button
+              onClick={() => setEdit(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
+            >
+              ✏️ Edit Profile
             </button>
-          </>
+          </div>
         )}
       </div>
     </div>

@@ -1,85 +1,106 @@
 'use client';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { User, Mail, Lock } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     name: '',
     email: '',
     password: '',
-    role: 'user'
+    role: 'user',
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-    const res = await fetch('/api/auth/register', {
-      method: 'POST',
-      body: JSON.stringify(formData),
-    });
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
 
-    if (res.ok) {
-      alert('Registration successful!');
+      alert('Registered successfully! Please log in.');
       router.push('/login');
-    } else {
-      alert(data.error || 'Registration failed');
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form
-        onSubmit={handleRegister}
-        className="bg-white p-8 rounded shadow-md w-full max-w-sm"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">Register</h2>
-
-        <input
-          type="text"
-          placeholder="Name"
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
-        />
-
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          required
-        />
-
-        <select
-          className="w-full mb-6 px-4 py-2 border border-gray-300 rounded bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
-          value={formData.role}
-          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
-        >
-          Register
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 px-4">
+      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl shadow-2xl p-10 w-full max-w-md text-white">
+        <h2 className="text-3xl font-bold text-center mb-6 tracking-wide">Create Account</h2>
+        <div className="space-y-5">
+          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+            <User className="w-5 h-5 mr-3 text-white" />
+            <input
+              name="name"
+              placeholder="Name"
+              className="bg-transparent outline-none text-white placeholder-gray-300 w-full"
+              onChange={handleChange}
+              value={form.name}
+            />
+          </div>
+          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+            <Mail className="w-5 h-5 mr-3 text-white" />
+            <input
+              name="email"
+              placeholder="Email"
+              className="bg-transparent outline-none text-white placeholder-gray-300 w-full"
+              onChange={handleChange}
+              value={form.email}
+            />
+          </div>
+          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+            <Lock className="w-5 h-5 mr-3 text-white" />
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              className="bg-transparent outline-none text-white placeholder-gray-300 w-full"
+              onChange={handleChange}
+              value={form.password}
+            />
+          </div>
+          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+            <User className="w-5 h-5 mr-3 text-white" />
+            <select
+              name="role"
+              className="bg-transparent outline-none text-white w-full"
+              onChange={handleChange}
+              value={form.role}
+            >
+              <option value="user" className="text-black">User</option>
+              <option value="admin" className="text-black">Admin</option>
+            </select>
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-green-600 hover:bg-green-700 transition py-2 rounded-lg text-white font-semibold tracking-wide shadow-md hover:shadow-lg"
+          >
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+          <p className="text-center text-sm text-gray-300 mt-5">
+            Already have an account?{' '}
+            <Link href="/login" className="text-blue-400 hover:underline">Login</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

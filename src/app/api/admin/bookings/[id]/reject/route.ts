@@ -3,11 +3,10 @@ import Booking from '@/models/Booking';
 import { sendBookingEmail } from '@/lib/mailer';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(
-  _req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function DELETE(req: NextRequest) {
+  const url = new URL(req.url);
+  const id = url.pathname.split('/').at(-2); // Same as in approve/cancel/complete
+
   await connectToDB();
 
   try {
@@ -21,34 +20,27 @@ export async function PATCH(
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.status !== 'pending') {
-      return NextResponse.json({ message: 'Booking is not in pending state' }, { status: 400 });
+    if (booking.status === 'confirmed') {
+      return NextResponse.json({ error: 'Cannot reject a confirmed booking' }, { status: 400 });
     }
 
-    booking.status = 'rejected';
-    await booking.save();
-
-    const receiver = booking.bookedBy;
-    const giver = booking.bookedWith;
     const title = booking.serviceOffer?.title || booking.serviceRequest?.title || 'a session';
-    const dateStr = new Date(booking.scheduledDate).toLocaleDateString();
+    const date = new Date(booking.scheduledDate).toLocaleDateString();
+    const bookedBy = booking.bookedBy;
 
-    // Notify both users
-    await sendBookingEmail({
-      to: receiver.email,
-      subject: '❌ Your session request was rejected',
-      text: `Hi ${receiver.name},\n\nYour session "${title}" with ${giver.name} on ${dateStr} was rejected by the admin.\nNo credits were deducted.`,
-    });
+    await booking.deleteOne();
 
     await sendBookingEmail({
-      to: giver.email,
-      subject: '❌ You rejected a session request',
-      text: `Hi ${giver.name},\n\nYou have rejected the session "${title}" requested by ${receiver.name} scheduled for ${dateStr}.`,
+      to: bookedBy.email,
+      subject: '❌ Your booking request was rejected',
+      text: `Hi ${bookedBy.name},\n\nYour booking for "${title}" scheduled on ${date} has been rejected by the admin.\n\nYou may try booking another service.\n\n- TimeBank Team`,
     });
 
-    return NextResponse.json({ message: 'Booking rejected and users notified' });
+    console.log(`❌ Booking ${id} rejected by admin. Email sent to ${bookedBy.email}`);
+
+    return NextResponse.json({ message: 'Booking rejected and user notified' });
   } catch (err: any) {
-    console.error('❌ Rejection error:', err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error('❌ Reject Booking Error:', err.message);
+    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
   }
 }

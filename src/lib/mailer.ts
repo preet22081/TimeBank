@@ -1,13 +1,5 @@
 import nodemailer from 'nodemailer';
 
-export const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER, // ✅ use environment variable
-    pass: process.env.EMAIL_PASS, // ✅ use app password securely
-  },
-});
-
 export const sendBookingEmail = async ({
   to,
   subject,
@@ -17,8 +9,16 @@ export const sendBookingEmail = async ({
   subject: string;
   text: string;
 }) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail', // or use host, port for SMTP
+    auth: {
+      user: process.env.EMAIL_USER, // your email
+      pass: process.env.EMAIL_PASS, // app-specific password
+    },
+  });
+
   await transporter.sendMail({
-    from: process.env.EMAIL_USER, // ✅ consistent with transporter
+    from: `"TimeBank" <${process.env.EMAIL_USER}>`,
     to,
     subject,
     text,

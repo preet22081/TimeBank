@@ -58,7 +58,7 @@ export default function SearchPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 mt-28 text-white">
-      <h1 className="text-3xl font-extrabold mb-8">🔍 Search Offers & Requests</h1>
+      <h1 className="text-3xl font-extrabold mb-8">🔍 Search Offers For Booking</h1>
 
       {/* Search Bar */}
       <div className="bg-[#1e293b] shadow-lg p-6 rounded-lg mb-10 flex flex-col md:flex-row gap-4 items-center">
@@ -108,7 +108,7 @@ export default function SearchPage() {
       </div>
 
       {/* Service Requests */}
-      <div className="mt-10">
+      {/* <div className="mt-10">
         <h2 className="text-2xl font-semibold mb-4 text-green-400">🟢 Service Requests</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {requests.map((req: any) => (
@@ -124,7 +124,7 @@ export default function SearchPage() {
           ))}
           {!loading && requests.length === 0 && <p className="text-gray-400">No requests found.</p>}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

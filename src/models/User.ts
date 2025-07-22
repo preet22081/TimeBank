@@ -9,7 +9,7 @@ export interface IUser extends Document {
   skillsNeeded: string[];
   timeCredits: number;
   avatarUrl?: string;
-  role: 'user' | 'admin'; // ✅ include role in the TypeScript interface
+  role: 'user' | 'admin'; 
 }
 
 const UserSchema: Schema = new Schema(
@@ -26,7 +26,7 @@ const UserSchema: Schema = new Schema(
       type: String,
       enum: ['user', 'admin'],
       default: 'user',
-    }, // ✅ add this
+    },
   },
   { timestamps: true }
 );

@@ -1,45 +1,62 @@
 'use client';
 
-export default function DashboardPage() {
+import { useEffect, useState } from 'react';
+
+interface Booking {
+  status: string;
+  scheduledDate: string;
+  bookedWith: { name: string };
+}
+
+export default function UserDashboard() {
+  const [user, setUser] = useState<any>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('timebank_token');
+    if (!token) return;
+
+    const decoded = JSON.parse(atob(token.split('.')[1]));
+    setUser(decoded);
+
+    fetch('/api/admin/bookings') // Reuse route to fetch all
+      .then(res => res.json())
+      .then(data => {
+        const myBookings = data.filter(
+          (b: any) =>
+            b.bookedBy?._id === decoded.userId || b.bookedWith?._id === decoded.userId
+        );
+        setBookings(myBookings);
+      });
+  }, []);
+
+  const pending = bookings.filter(b => b.status === 'pending').length;
+  const approved = bookings.filter(b => b.status === 'approved').length;
+  const upcoming = bookings.filter(b => b.status === 'approved');
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f172a] to-[#1e293b] text-white pt-24 px-6">
-      <h1 className="text-4xl font-bold text-center mb-10 tracking-tight drop-shadow">
-        Your Time Dashboard
-      </h1>
+    <div className="p-8 text-white">
+      <h1 className="text-3xl font-bold mb-4">👤 Welcome, {user?.name}</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div className="p-6 bg-[#1e293b] rounded-2xl shadow-md">
-          <h2 className="text-lg text-gray-300">Total Hours</h2>
-          <p className="text-3xl font-bold text-green-400 mt-1">120 hrs</p>
-        </div>
-
-        <div className="p-6 bg-[#1e293b] rounded-2xl shadow-md">
-          <h2 className="text-lg text-gray-300">Hours Given</h2>
-          <p className="text-3xl font-bold text-blue-400 mt-1">80 hrs</p>
-        </div>
-
-        <div className="p-6 bg-[#1e293b] rounded-2xl shadow-md">
-          <h2 className="text-lg text-gray-300">Hours Received</h2>
-          <p className="text-3xl font-bold text-purple-400 mt-1">40 hrs</p>
-        </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-blue-600 p-4 rounded shadow">Pending Bookings: {pending}</div>
+        <div className="bg-green-600 p-4 rounded shadow">Approved Bookings: {approved}</div>
       </div>
 
-      <div className="bg-[#1e293b] p-6 rounded-2xl shadow-md">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <span className="text-cyan-400">🩺</span> Recent Activity
-        </h2>
-        <ul className="space-y-3 text-sm text-gray-300">
-          <li>
-            <span className="text-green-400">✅</span> You gave{' '}
-            <span className="text-green-300 font-semibold">2 hours</span> to{' '}
-            <span className="text-white font-medium">Alice</span> for tutoring
-          </li>
-          <li>
-            <span className="text-purple-400">✅</span> You received{' '}
-            <span className="text-purple-300 font-semibold">1 hour</span> from{' '}
-            <span className="text-white font-medium">Bob</span> for gardening help
-          </li>
-        </ul>
+      <h2 className="text-xl font-semibold mb-3">📅 Upcoming Approved Sessions</h2>
+      <div className="bg-[#1e293b] p-4 rounded-lg shadow">
+        {upcoming.length === 0 ? (
+          <p className="text-gray-400">No upcoming sessions.</p>
+        ) : (
+          <ul>
+            {upcoming.map((b, i) => (
+              <li key={i} className="mb-2">
+                With <strong>{b.bookedWith?.name}</strong> on{' '}
+                {new Date(b.scheduledDate).toLocaleString()}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );

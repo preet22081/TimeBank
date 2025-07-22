@@ -1,5 +1,3 @@
-// lib/mongodb.ts
-
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
@@ -10,7 +8,7 @@ if (!MONGODB_URI) {
   );
 }
 
-// Global is used here to cache the connection in development
+// Global is used to cache the connection across hot reloads in development
 let cached = (global as any).mongoose || { conn: null, promise: null };
 
 export async function connectToDB() {
@@ -19,11 +17,11 @@ export async function connectToDB() {
   if (!cached.promise) {
     cached.promise = mongoose
       .connect(MONGODB_URI, {
-        dbName: "NEXTJS-PROJECT",
+        dbName: "timebank", // ✅ Use your MongoDB Atlas DB name
         bufferCommands: false,
       })
       .then((mongoose) => {
-        console.log("✅ MongoDB Connected");
+        console.log("✅ MongoDB Connected to Atlas");
         return mongoose;
       })
       .catch((err) => {

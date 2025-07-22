@@ -65,7 +65,7 @@ export default function LoginPage() {
               value={form.password}
             />
           </div>
-          <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
+          {/* <div className="flex items-center bg-white/20 rounded-lg px-4 py-2">
             <User className="w-5 h-5 mr-3 text-white" />
             <select
               name="role"
@@ -76,7 +76,7 @@ export default function LoginPage() {
               <option value="user" className="text-black">User</option>
               <option value="admin" className="text-black">Admin</option>
             </select>
-          </div>
+          </div> */}
           <button
             onClick={handleSubmit}
             disabled={loading}

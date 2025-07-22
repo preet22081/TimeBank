@@ -21,7 +21,7 @@ export default function Navbar() {
             ['Dashboard', '/dashboard'],
             ['Search', '/search'],
             ['Add Offer', '/add-offer'],
-            ['Add Request', '/add-request'],
+            // ['Add Request', '/add-request'],
             ['Bookings', '/bookings'],
           ].map(([label, path]) => (
             <Link

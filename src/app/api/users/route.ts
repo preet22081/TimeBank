@@ -3,9 +3,14 @@ import User from "@/models/User";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  await connectToDB();
-  const users = await User.find();
-  return NextResponse.json(users, { status: 200 });
+  try {
+    await connectToDB();
+    const users = await User.find({}, 'name email role');
+    return NextResponse.json(users);
+  } catch (err) {
+    console.error('[ADMIN_GET_USERS_ERROR]', err);
+    return NextResponse.json({ error: 'Failed to load users' }, { status: 500 });
+  }
 }
 
 export async function POST(req: Request) {

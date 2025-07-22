@@ -117,14 +117,14 @@ export default function ProfilePage() {
               <span className="font-semibold text-gray-300">Bio:</span>{' '}
               {user.bio || <span className="text-gray-500">-</span>}
             </p>
-            <p>
+            {/* <p>
               <span className="font-semibold text-gray-300">Skills Offered:</span>{' '}
               {user.skillOffered?.join(', ') || <span className="text-gray-500">-</span>}
             </p>
             <p>
               <span className="font-semibold text-gray-300">Skills Needed:</span>{' '}
               {user.skillNeeded?.join(', ') || <span className="text-gray-500">-</span>}
-            </p>
+            </p> */}
             <button
               onClick={() => setEdit(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"

@@ -5,39 +5,35 @@ import { useEffect, useState } from 'react';
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
 
-  const token =
-    typeof window !== 'undefined' ? localStorage.getItem('timebank_token') : null;
-  const userId = token ? JSON.parse(atob(token.split('.')[1])).userId : null;
+  useEffect(() => {
+    const token = localStorage.getItem('timebank_token');
+    if (!token) return;
 
-  const fetchBookings = async () => {
-    try {
-      const res = await fetch('/api/bookings');
-      const data = await res.json();
-      const myBookings = data.filter(
-        (b: any) => b.bookedBy._id === userId || b.bookedWith._id === userId
-      );
-      setBookings(myBookings);
-    } catch (err) {
-      console.error('Failed to fetch bookings:', err);
-    }
-  };
+    const userId = JSON.parse(atob(token.split('.')[1])).userId;
 
-  const handleCancel = async (id: string) => {
+    fetch('/api/admin/bookings')
+      .then(res => res.json())
+      .then(data => {
+        const myBookings = data.filter(
+          (b: any) =>
+            b.bookedBy?._id === userId || b.bookedWith?._id === userId
+        );
+        setBookings(myBookings);
+      });
+  }, []);
+
+  const cancelBooking = async (id: string) => {
     const confirmed = confirm('Are you sure you want to cancel this booking?');
     if (!confirmed) return;
 
     const res = await fetch(`/api/bookings/${id}`, { method: 'DELETE' });
     if (res.ok) {
       alert('Booking cancelled.');
-      fetchBookings();
+      setBookings(prev => prev.filter(b => b._id !== id));
     } else {
       alert('Failed to cancel.');
     }
   };
-
-  useEffect(() => {
-    fetchBookings();
-  }, []);
 
   return (
     <div className="max-w-4xl mx-auto mt-28 px-4 text-white">
@@ -54,31 +50,22 @@ export default function BookingsPage() {
               key={b._id}
               className="bg-[#1e293b] border border-gray-700 p-5 rounded-lg shadow hover:shadow-lg transition"
             >
-              <p className="mb-1">
-                <span className="font-medium text-gray-300">👤 With:</span>{' '}
-                {b.bookedWith.name}
-              </p>
-              <p className="mb-1">
-                <span className="font-medium text-gray-300">📅 Scheduled:</span>{' '}
-                {new Date(b.scheduledDate).toLocaleDateString()}
-              </p>
+              <p className="mb-1">👤 With: {b.bookedWith?.name || 'N/A'}</p>
+              <p className="mb-1">📅 Scheduled: {new Date(b.scheduledDate).toLocaleDateString()}</p>
               <p className="mb-3">
-                <span className="font-medium text-gray-300">⏳ Status:</span>{' '}
-                <span
-                  className={`font-bold ${
-                    b.status === 'pending'
-                      ? 'text-yellow-400'
-                      : b.status === 'approved'
-                      ? 'text-green-400'
-                      : 'text-red-400'
-                  }`}
-                >
+                ⏳ Status:{' '}
+                <span className={`font-bold ${
+                  b.status === 'pending'
+                    ? 'text-yellow-400'
+                    : b.status === 'approved'
+                    ? 'text-green-400'
+                    : 'text-red-400'
+                }`}>
                   {b.status}
                 </span>
               </p>
-
               <button
-                onClick={() => handleCancel(b._id)}
+                onClick={() => cancelBooking(b._id)}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 text-sm rounded"
               >
                 Cancel Booking

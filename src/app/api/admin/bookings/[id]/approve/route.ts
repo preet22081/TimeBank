@@ -1,13 +1,12 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { connectToDB } from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import { sendBookingEmail } from '@/lib/mailer';
-import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(
-  _req: NextRequest,
-  { params }: { params: { id: string } } // ✅ This is the correct typing for App Router
-) {
-  const { id } = params;
+export async function PATCH(req: NextRequest) {
+  const url = new URL(req.url);
+  const id = url.pathname.split('/').at(-2); // or use regex
+
   await connectToDB();
 
   try {
@@ -25,9 +24,7 @@ export async function PATCH(
       return NextResponse.json({ message: 'Booking already confirmed' }, { status: 200 });
     }
 
-    const time =
-      booking.serviceOffer?.timeRequired || booking.serviceRequest?.timeRequired || 1;
-
+    const time = booking.serviceOffer?.timeRequired || booking.serviceRequest?.timeRequired || 1;
     const giver = booking.bookedWith;
     const receiver = booking.bookedBy;
 

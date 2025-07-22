@@ -2,13 +2,13 @@ import { connectToDB } from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import User from '@/models/User';
 import { sendBookingEmail } from '@/lib/mailer';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(_: Request, { params }: { params: { id: string } }) {
+export async function PATCH(_: NextRequest, context: { params: { id: string } }) {
   await connectToDB();
 
   try {
-    const booking = await Booking.findById(params.id)
+    const booking = await Booking.findById(context.params.id)
       .populate('bookedBy')
       .populate('bookedWith')
       .populate('serviceOffer')
@@ -24,21 +24,18 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
     const receiver = booking.bookedBy;
     const giver = booking.bookedWith;
 
-    // Reverse credits
     receiver.timeCredits += time;
     giver.timeCredits -= time;
 
     await receiver.save();
     await giver.save();
 
-    // Update booking status
     booking.status = 'cancelled';
     await booking.save();
 
     const date = new Date(booking.scheduledDate).toLocaleDateString();
     const title = booking.serviceOffer?.title || booking.serviceRequest?.title || 'a session';
 
-    // Notify both users
     await sendBookingEmail({
       to: receiver.email,
       subject: '⚠️ Your session was cancelled',
@@ -50,8 +47,6 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
       subject: '⚠️ A session you had was cancelled',
       text: `Hi ${giver.name},\n\nThe session "${title}" with ${receiver.name} on ${date} was cancelled by the admin.\n${time} hour(s) were removed from your account.`,
     });
-
-    console.log(`🚫 Booking ${booking._id} cancelled by admin. Credits rolled back.`);
 
     return NextResponse.json({ message: 'Booking cancelled and credits reversed' });
   } catch (err: any) {

@@ -1,13 +1,13 @@
 import { connectToDB } from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import { sendBookingEmail } from '@/lib/mailer';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_: NextRequest, context: { params: { id: string } }) {
   await connectToDB();
 
   try {
-    const booking = await Booking.findById(params.id)
+    const booking = await Booking.findById(context.params.id)
       .populate('bookedBy')
       .populate('bookedWith')
       .populate('serviceOffer')
@@ -25,17 +25,13 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
     const date = new Date(booking.scheduledDate).toLocaleDateString();
     const bookedBy = booking.bookedBy;
 
-    // Mark as rejected instead of deleting
     await booking.deleteOne();
-
 
     await sendBookingEmail({
       to: bookedBy.email,
       subject: '❌ Your booking request was rejected',
       text: `Hi ${bookedBy.name},\n\nYour booking for "${title}" scheduled on ${date} has been rejected by the admin.\n\nYou may try booking another service.\n\n- TimeBank Team`,
     });
-
-    console.log(`❌ Booking ${params.id} rejected by admin. Email sent to ${bookedBy.email}`);
 
     return NextResponse.json({ message: 'Booking rejected and user notified' });
   } catch (err: any) {

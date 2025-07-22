@@ -4,10 +4,11 @@ import { sendBookingEmail } from '@/lib/mailer';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PATCH(_req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
   await connectToDB();
 
   try {
-    const booking = await Booking.findById(context.params.id)
+    const booking = await Booking.findById(id)
       .populate('bookedBy')
       .populate('bookedWith')
       .populate('serviceOffer')

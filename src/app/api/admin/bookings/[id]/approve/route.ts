@@ -2,13 +2,13 @@ import { connectToDB } from '@/lib/mongodb';
 import Booking from '@/models/Booking';
 import User from '@/models/User';
 import { sendBookingEmail } from '@/lib/mailer';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(_: Request, { params }: { params: { id: string } }) {
+export async function PATCH(_: NextRequest, context: { params: { id: string } }) {
   await connectToDB();
 
   try {
-    const booking = await Booking.findById(params.id)
+    const booking = await Booking.findById(context.params.id)
       .populate('bookedBy')
       .populate('bookedWith')
       .populate('serviceOffer')
@@ -32,7 +32,6 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
       return NextResponse.json({ error: 'Insufficient time credits' }, { status: 400 });
     }
 
-    // Transfer credits
     receiver.timeCredits -= time;
     giver.timeCredits += time;
 

@@ -3,11 +3,12 @@ import Booking from '@/models/Booking';
 import { sendBookingEmail } from '@/lib/mailer';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function DELETE(_: NextRequest, context: { params: { id: string } }) {
+export async function PATCH(_req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
   await connectToDB();
 
   try {
-    const booking = await Booking.findById(context.params.id)
+    const booking = await Booking.findById(id)
       .populate('bookedBy')
       .populate('bookedWith')
       .populate('serviceOffer')
@@ -18,24 +19,46 @@ export async function DELETE(_: NextRequest, context: { params: { id: string } }
     }
 
     if (booking.status === 'confirmed') {
-      return NextResponse.json({ error: 'Cannot reject a confirmed booking' }, { status: 400 });
+      return NextResponse.json({ message: 'Booking already confirmed' }, { status: 200 });
     }
 
-    const title = booking.serviceOffer?.title || booking.serviceRequest?.title || 'a session';
-    const date = new Date(booking.scheduledDate).toLocaleDateString();
-    const bookedBy = booking.bookedBy;
+    const time =
+      booking.serviceOffer?.timeRequired || booking.serviceRequest?.timeRequired || 1;
 
-    await booking.deleteOne();
+    const giver = booking.bookedWith;
+    const receiver = booking.bookedBy;
+
+    if (receiver.timeCredits < time) {
+      return NextResponse.json({ error: 'Insufficient time credits' }, { status: 400 });
+    }
+
+    receiver.timeCredits -= time;
+    giver.timeCredits += time;
+
+    await receiver.save();
+    await giver.save();
+
+    booking.status = 'confirmed';
+    await booking.save();
+
+    const dateStr = new Date(booking.scheduledDate).toLocaleDateString();
+    const title = booking.serviceOffer?.title || booking.serviceRequest?.title || 'a session';
 
     await sendBookingEmail({
-      to: bookedBy.email,
-      subject: '❌ Your booking request was rejected',
-      text: `Hi ${bookedBy.name},\n\nYour booking for "${title}" scheduled on ${date} has been rejected by the admin.\n\nYou may try booking another service.\n\n- TimeBank Team`,
+      to: receiver.email,
+      subject: '✅ Your session is confirmed!',
+      text: `Hi ${receiver.name},\n\nYour session "${title}" with ${giver.name} has been confirmed for ${dateStr}.\n${time} hour(s) were deducted from your account.`,
     });
 
-    return NextResponse.json({ message: 'Booking rejected and user notified' });
+    await sendBookingEmail({
+      to: giver.email,
+      subject: '📅 You have a confirmed session!',
+      text: `Hi ${giver.name},\n\nYou have a confirmed session "${title}" with ${receiver.name} on ${dateStr}.\n${time} hour(s) were added to your time credits.`,
+    });
+
+    return NextResponse.json({ message: 'Booking approved, credits updated, emails sent' });
   } catch (err: any) {
-    console.error('❌ Reject Booking Error:', err.message);
-    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
+    console.error('❌ Approval error:', err.message);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

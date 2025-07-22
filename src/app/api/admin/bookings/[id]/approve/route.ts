@@ -3,7 +3,7 @@ import Booking from '@/models/Booking';
 import { sendBookingEmail } from '@/lib/mailer';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function PATCH(_: NextRequest, context: { params: { id: string } }) {
+export async function PATCH(_req: NextRequest, context: { params: { id: string } }) {
   await connectToDB();
 
   try {

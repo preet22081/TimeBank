@@ -1,6 +1,5 @@
 import { connectToDB } from '@/lib/mongodb';
 import Booking from '@/models/Booking';
-import User from '@/models/User';
 import { sendBookingEmail } from '@/lib/mailer';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -55,8 +54,6 @@ export async function PATCH(_: NextRequest, context: { params: { id: string } })
       subject: '📅 You have a confirmed session!',
       text: `Hi ${giver.name},\n\nYou have a confirmed session "${title}" with ${receiver.name} on ${dateStr}.\n${time} hour(s) were added to your time credits.`,
     });
-
-    console.log(`✅ Booking ${booking._id} approved by admin. Time transferred: ${time}h`);
 
     return NextResponse.json({ message: 'Booking approved, credits updated, emails sent' });
   } catch (err: any) {

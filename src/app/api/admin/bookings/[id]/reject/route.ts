@@ -21,47 +21,34 @@ export async function PATCH(
       return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
     }
 
-    if (booking.status === 'confirmed') {
-      return NextResponse.json({ message: 'Booking already confirmed' }, { status: 200 });
+    if (booking.status !== 'pending') {
+      return NextResponse.json({ message: 'Booking is not in pending state' }, { status: 400 });
     }
 
-    const time =
-      booking.serviceOffer?.timeRequired || booking.serviceRequest?.timeRequired || 1;
-
-    const giver = booking.bookedWith;
-    const receiver = booking.bookedBy;
-
-    if (receiver.timeCredits < time) {
-      return NextResponse.json({ error: 'Insufficient time credits' }, { status: 400 });
-    }
-
-    receiver.timeCredits -= time;
-    giver.timeCredits += time;
-
-    await receiver.save();
-    await giver.save();
-
-    booking.status = 'confirmed';
+    booking.status = 'rejected';
     await booking.save();
 
-    const dateStr = new Date(booking.scheduledDate).toLocaleDateString();
+    const receiver = booking.bookedBy;
+    const giver = booking.bookedWith;
     const title = booking.serviceOffer?.title || booking.serviceRequest?.title || 'a session';
+    const dateStr = new Date(booking.scheduledDate).toLocaleDateString();
 
+    // Notify both users
     await sendBookingEmail({
       to: receiver.email,
-      subject: '✅ Your session is confirmed!',
-      text: `Hi ${receiver.name},\n\nYour session "${title}" with ${giver.name} has been confirmed for ${dateStr}.\n${time} hour(s) were deducted from your account.`,
+      subject: '❌ Your session request was rejected',
+      text: `Hi ${receiver.name},\n\nYour session "${title}" with ${giver.name} on ${dateStr} was rejected by the admin.\nNo credits were deducted.`,
     });
 
     await sendBookingEmail({
       to: giver.email,
-      subject: '📅 You have a confirmed session!',
-      text: `Hi ${giver.name},\n\nYou have a confirmed session "${title}" with ${receiver.name} on ${dateStr}.\n${time} hour(s) were added to your time credits.`,
+      subject: '❌ You rejected a session request',
+      text: `Hi ${giver.name},\n\nYou have rejected the session "${title}" requested by ${receiver.name} scheduled for ${dateStr}.`,
     });
 
-    return NextResponse.json({ message: 'Booking approved, credits updated, emails sent' });
+    return NextResponse.json({ message: 'Booking rejected and users notified' });
   } catch (err: any) {
-    console.error('❌ Approval error:', err.message);
+    console.error('❌ Rejection error:', err.message);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

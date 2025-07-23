@@ -1,5 +1,6 @@
+// File: /app/api/admin/users/[id]/route.ts
 import { connectToDB } from '@/lib/mongodb';
-import Booking from '@/models/Booking';
+import User from '@/models/User';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function PATCH(req: NextRequest) {
@@ -8,21 +9,21 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
 
     const url = new URL(req.url);
-    const id = url.pathname.split('/').at(-2); // Extract booking ID
+    const id = url.pathname.split('/').at(-2); // Extract user ID
 
-    const booking = await Booking.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
       id,
-      { status: body.status },
+      body, // directly update with the provided fields
       { new: true }
     );
 
-    if (!booking) {
-      return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(booking, { status: 200 });
+    return NextResponse.json(user, { status: 200 });
   } catch (err) {
-    console.error('[BOOKING_UPDATE_ERROR]', err);
-    return NextResponse.json({ error: 'Failed to update booking' }, { status: 500 });
+    console.error('[USER_UPDATE_ERROR]', err);
+    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 });
   }
 }
